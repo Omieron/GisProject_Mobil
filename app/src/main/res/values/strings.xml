@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">GisMobil</string>
+    <string name="mapbox_access_token">API_KEYIM</string>
+</resources>
