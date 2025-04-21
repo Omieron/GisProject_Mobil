@@ -24,7 +24,7 @@
         android:id="@+id/welcomeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="XXX Belediye Sistemine Hoşgeldiniz"
+        android:text="Edremit Belediye'si Sistemine Hoşgeldiniz"
         android:padding="16dp"
         android:textSize="18sp"
         android:layout_marginStart="16dp"
