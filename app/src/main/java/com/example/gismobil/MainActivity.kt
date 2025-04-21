@@ -1,5 +1,6 @@
 package com.example.gismobil
 
+import com.example.gismobil.settings.SettingsFragment
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -13,6 +14,7 @@ import com.example.gismobil.map.GlobeRotator
 import com.example.gismobil.map.MapInitializer
 import com.example.gismobil.map.MapUtils
 import com.example.gismobil.utils.PerformanceUtils
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mapbox.geojson.Point
 import com.mapbox.maps.MapView
 
@@ -20,6 +22,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var mapView: MapView
     private lateinit var welcomeButton: Button
+    private lateinit var navView: BottomNavigationView
     private val handler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,6 +40,7 @@ class MainActivity : AppCompatActivity() {
         // UI bileşenlerini başlat
         mapView = findViewById(R.id.mapView)
         welcomeButton = findViewById(R.id.welcomeButton)
+        navView = findViewById(R.id.nav_view)
 
         // Haritayı başlat (cihaz performansına göre)
         MapInitializer.setupMap(this, mapView, isLowPerformanceMode)
@@ -61,11 +65,43 @@ class MainActivity : AppCompatActivity() {
             CameraHelper.flyToEdremit(mapView, edremitLocation)
 
             // Animasyon tamamlandıktan sonra chat arayüzünü göster
-            // 5 saniye sonra (animasyon süresi kadar)
             handler.postDelayed({
-                showChatInterface()
-            }, 5000) // 5 saniye (CameraHelper.kt'deki animasyon süresi ile aynı)
+                // Sohbet sekmesine geç
+                navView.selectedItemId = R.id.navigation_chat
+            }, 5000)
         }
+
+        // Bottom Navigation için listener ekle
+        navView.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_map -> {
+                    // Sadece haritayı göster
+                    showMap()
+                    true
+                }
+                R.id.navigation_chat -> {
+                    // Chat arayüzünü göster
+                    showChatInterface()
+                    true
+                }
+                R.id.navigation_settings -> {
+                    // Ayarlar arayüzünü göster
+                    showSettingsInterface()
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
+    // Haritayı göster ve fragment'ları kaldır
+    private fun showMap() {
+        supportFragmentManager.fragments.forEach { fragment ->
+            if (fragment.isVisible) {
+                supportFragmentManager.beginTransaction().remove(fragment).commit()
+            }
+        }
+        mapView.visibility = View.VISIBLE
     }
 
     // Sohbet arayüzünü gösterme
@@ -73,22 +109,28 @@ class MainActivity : AppCompatActivity() {
         val chatFragment = ChatFragment()
 
         supportFragmentManager.beginTransaction()
-            .add(android.R.id.content, chatFragment)
-            .addToBackStack(null)
+            .replace(R.id.nav_host_fragment, chatFragment)
             .commit()
+
+        // Haritayı göstermeye devam et ama arkada dursun
+        mapView.visibility = View.VISIBLE
+    }
+
+    // Ayarlar arayüzünü gösterme
+    private fun showSettingsInterface() {
+        val settingsFragment = SettingsFragment()
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.nav_host_fragment, settingsFragment)
+            .commit()
+
+        // Haritayı göstermeye devam et ama arkada dursun
+        mapView.visibility = View.VISIBLE
     }
 
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
         GlobeRotator.stop()
-    }
-
-    override fun onBackPressed() {
-        if (supportFragmentManager.backStackEntryCount > 0) {
-            supportFragmentManager.popBackStack()
-        } else {
-            super.onBackPressed()
-        }
     }
 }
