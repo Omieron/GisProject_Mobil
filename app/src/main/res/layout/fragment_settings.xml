@@ -42,19 +42,75 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switch_performance"
+            <TextView
+                android:id="@+id/tv_performance_level"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Yüksek Performans Modu"
-                android:textSize="16sp" />
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:gravity="center"
+                android:text="Denge (Orta)"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Performans"
+                    android:textSize="14sp" />
+
+                <SeekBar
+                    android:id="@+id/seekbar_performance"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:max="2"
+                    android:progress="1"
+                    android:progressTint="@android:color/holo_blue_dark"
+                    android:thumbTint="@android:color/holo_blue_dark" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Kalite"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Performans Modları:"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="3D binalar ve detaylı harita öğeleri için yüksek performans modunu açık tutun."
+                android:text="• Performans: Daha basit harita ve daha hızlı çalışma"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="• Denge: Normal harita detayları, 3D binalar kapalı"
+                android:textSize="14sp"
+                android:textColor="#666666" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="• Kalite: Tüm harita detayları ve 3D binalar açık"
                 android:textSize="14sp"
                 android:textColor="#666666" />
 

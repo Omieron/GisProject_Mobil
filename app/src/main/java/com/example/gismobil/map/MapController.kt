@@ -13,11 +13,11 @@ class MapController(
     private val context: Context,
     private val mapView: MapView
 ) {
-    private val isLowPerformanceMode: Boolean
+    private val performanceLevel: Int
 
     init {
-        // Performans durumunu kontrol et
-        isLowPerformanceMode = PerformanceUtils.isLowPerformanceMode(context)
+        // Performans seviyesini kontrol et
+        performanceLevel = PerformanceUtils.getPerformanceLevel(context)
 
         // Haritayı başlat
         setupMap()
@@ -30,11 +30,11 @@ class MapController(
      * Haritayı ve ilgili özellikleri başlatır
      */
     private fun setupMap() {
-        // Haritayı başlat (cihaz performansına göre)
-        MapInitializer.setupMap(context, mapView, isLowPerformanceMode)
+        // Haritayı performans seviyesine göre başlat
+        MapInitializer.setupMap(context, mapView, performanceLevel)
 
-        // 3D binaları haritaya ekle (sadece yüksek performanslı cihazlarda)
-        if (!isLowPerformanceMode) {
+        // Sadece yüksek performans modunda 3D binaları ekle
+        if (performanceLevel == PerformanceUtils.PERFORMANCE_HIGH) {
             MapUtils.add3DBuildings(mapView)
         }
     }
@@ -54,9 +54,20 @@ class MapController(
             val logoPlugin = mapView.logo
             val attributionPlugin = mapView.attribution
 
-            // En basit ayarları yapalım
-            logoPlugin.enabled = true  // Logoyu aktif tut
-            attributionPlugin.enabled = true  // Attribution'ı aktif tut
+            // Performans seviyesine göre logo ve attribution ayarları
+            when (performanceLevel) {
+                PerformanceUtils.PERFORMANCE_LOW -> {
+                    // Düşük performans modunda minimum görünürlük
+                    logoPlugin.enabled = true
+                    attributionPlugin.enabled = true
+                    // Daha sade görünüm için ayarlar yapılabilir
+                }
+                PerformanceUtils.PERFORMANCE_MEDIUM, PerformanceUtils.PERFORMANCE_HIGH -> {
+                    // Orta ve yüksek performans modunda tam görünürlük
+                    logoPlugin.enabled = true
+                    attributionPlugin.enabled = true
+                }
+            }
 
         } catch (e: Exception) {
             // Herhangi bir hata durumunda logoyu ve attribution'ı varsayılan halde bırak

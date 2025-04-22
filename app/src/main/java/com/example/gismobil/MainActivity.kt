@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Performans durumunu kontrol et ve kaydet
+        // Performans durumunu kontrol et ve kaydet (yeni sistem)
         PerformanceUtils.checkAndSavePerformanceMode(this)
 
         setContentView(R.layout.activity_main)
