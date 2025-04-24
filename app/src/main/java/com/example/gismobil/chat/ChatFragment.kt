@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -23,8 +25,13 @@ class ChatFragment : Fragment() {
     private lateinit var etMessage: EditText
     private lateinit var btnSend: ImageButton
     private lateinit var btnBack: ImageButton
+    private lateinit var btnMic: ImageButton  // Mikrofon butonu
+    private lateinit var chatTitle: TextView
     private lateinit var backgroundOverlay: View  // Arka plan overlay'i
     private val messageList = ArrayList<Message>()
+
+    // Ses tanıma yardımcısı
+    private lateinit var speechRecognizerHelper: SpeechRecognizerHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +49,8 @@ class ChatFragment : Fragment() {
         etMessage = view.findViewById(R.id.et_message)
         btnSend = view.findViewById(R.id.btn_send)
         btnBack = view.findViewById(R.id.btn_back)
+        btnMic = view.findViewById(R.id.btn_mic)  // Mikrofon butonu
+        chatTitle = view.findViewById(R.id.tv_chat_title)
         backgroundOverlay = view.findViewById(R.id.transparentBackground)
 
         // RecyclerView ayarları
@@ -70,6 +79,34 @@ class ChatFragment : Fragment() {
                 etMessage.setText("")
             }
         }
+
+        // Ses tanıma yardımcısını başlat
+        initializeSpeechRecognizer()
+
+        // Mikrofon butonuna uzun basma için özel yardım mesajı
+        btnMic.setOnLongClickListener {
+            context?.let {
+                Toast.makeText(it, "İpucu: Konuşma sırasında duraksamalarda metin korunur", Toast.LENGTH_LONG).show()
+            }
+            false // false döndürerek normal tıklama olayının da gerçekleşmesini sağlıyoruz
+        }
+    }
+
+    /**
+     * Ses tanıma yardımcısını başlatır
+     */
+    private fun initializeSpeechRecognizer() {
+        context?.let { ctx ->
+            speechRecognizerHelper = SpeechRecognizerHelper(ctx, btnMic, etMessage)
+        }
+    }
+
+    /**
+     * İzin sonuçlarını işler
+     */
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        speechRecognizerHelper.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 
     // Arka plan efektini cihaz performansına göre ayarla
@@ -165,5 +202,13 @@ class ChatFragment : Fragment() {
         messageList.addAll(messages)
         messageAdapter.notifyDataSetChanged()
         recyclerView.scrollToPosition(messageList.size - 1)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Ses tanıma kaynakları temizle
+        if (::speechRecognizerHelper.isInitialized) {
+            speechRecognizerHelper.cleanup()
+        }
     }
 }
